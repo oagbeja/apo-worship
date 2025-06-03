@@ -1,0 +1,1 @@
+"use strict";const n=require("electron");n.contextBridge.exposeInMainWorld("api",{getVerse:(e,r,i)=>n.ipcRenderer.invoke("get-verse",e,r,i)});n.contextBridge.exposeInMainWorld("electron",{ipcRenderer:{send:(e,r)=>n.ipcRenderer.send(e,r),on:(e,r)=>n.ipcRenderer.on(e,(i,...o)=>r(...o))}});
