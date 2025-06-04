@@ -13,8 +13,10 @@
     "postbuild:electron": "cpy electron/db/tables/*.* dist-electron/db/tables"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.4",
     "@tailwindcss/vite": "^4.1.8",
     "dotenv": "^16.5.0",
+    "lucide-react": "^0.512.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^7.6.1",

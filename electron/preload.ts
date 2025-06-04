@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer } from "electron";
 contextBridge.exposeInMainWorld("api", {
   getVerse: (book: string, chapter: number, verse: number) =>
     ipcRenderer.invoke("get-verse", book, chapter, verse),
+  getBooks: () => ipcRenderer.invoke("get-books"),
 });
 
 contextBridge.exposeInMainWorld("electron", {

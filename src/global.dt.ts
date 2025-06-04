@@ -14,6 +14,7 @@ declare global {
   interface Window {
     api: {
       getVerse(book: string, chapter: number): Promise<IOutputVerse | null>;
+      getBooks(): Promise<Record<string, any>[]>;
     };
     electron: {
       ipcRenderer: {

@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, screen } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-import { getVerse } from "./db/services/bible-service";
+import { getBooks, getVerse } from "./db/services/bible-service";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,8 +64,10 @@ app.whenReady().then(() => {
 ipcMain.handle("get-verse", (event, book, chapter) => {
   // console.log('Table "items" created or already exists.');
   return getVerse(book, chapter);
+});
 
-  return [1, 2, 3];
+ipcMain.handle("get-books", (event) => {
+  return getBooks();
 });
 
 ipcMain.on("trigger-presentation", (event, payload) => {

@@ -1,241 +1,258 @@
-import { app as B, screen as S, BrowserWindow as T, ipcMain as A } from "electron";
-import g from "path";
-import { fileURLToPath as k } from "url";
-import C from "fs";
-import W from "os";
+import { app as C, screen as S, BrowserWindow as I, ipcMain as V } from "electron";
+import h from "path";
+import { fileURLToPath as A } from "url";
+import W from "fs";
+import J from "os";
 import q from "crypto";
-import J from "fs/promises";
-function G(l) {
-  return l && l.__esModule && Object.prototype.hasOwnProperty.call(l, "default") ? l.default : l;
+import G from "fs/promises";
+function Q(a) {
+  return a && a.__esModule && Object.prototype.hasOwnProperty.call(a, "default") ? a.default : a;
 }
-var d = { exports: {} };
-const Q = "16.5.0", H = {
-  version: Q
+var p = { exports: {} };
+const H = "16.5.0", z = {
+  version: H
 };
-var I;
-function z() {
-  if (I) return d.exports;
-  I = 1;
-  const l = C, u = g, p = W, v = q, E = H.version, x = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
-  function K(e) {
+var $;
+function X() {
+  if ($) return p.exports;
+  $ = 1;
+  const a = W, i = h, f = J, g = q, E = z.version, K = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
+  function L(e) {
     const n = {};
     let r = e.toString();
     r = r.replace(/\r\n?/mg, `
 `);
-    let a;
-    for (; (a = x.exec(r)) != null; ) {
-      const i = a[1];
-      let t = a[2] || "";
+    let s;
+    for (; (s = K.exec(r)) != null; ) {
+      const u = s[1];
+      let t = s[2] || "";
       t = t.trim();
       const o = t[0];
       t = t.replace(/^(['"`])([\s\S]*)\1$/mg, "$2"), o === '"' && (t = t.replace(/\\n/g, `
-`), t = t.replace(/\\r/g, "\r")), n[i] = t;
+`), t = t.replace(/\\r/g, "\r")), n[u] = t;
     }
     return n;
   }
-  function L(e) {
-    const n = O(e), r = c.configDotenv({ path: n });
+  function Y(e) {
+    const n = O(e), r = l.configDotenv({ path: n });
     if (!r.parsed) {
       const o = new Error(`MISSING_DATA: Cannot parse ${n} for an unknown reason`);
       throw o.code = "MISSING_DATA", o;
     }
-    const a = V(e).split(","), i = a.length;
+    const s = b(e).split(","), u = s.length;
     let t;
-    for (let o = 0; o < i; o++)
+    for (let o = 0; o < u; o++)
       try {
-        const s = a[o].trim(), f = R(r, s);
-        t = c.decrypt(f.ciphertext, f.key);
+        const c = s[o].trim(), d = j(r, c);
+        t = l.decrypt(d.ciphertext, d.key);
         break;
-      } catch (s) {
-        if (o + 1 >= i)
-          throw s;
+      } catch (c) {
+        if (o + 1 >= u)
+          throw c;
       }
-    return c.parse(t);
+    return l.parse(t);
   }
-  function Y(e) {
+  function R(e) {
     console.log(`[dotenv@${E}][WARN] ${e}`);
   }
-  function _(e) {
+  function y(e) {
     console.log(`[dotenv@${E}][DEBUG] ${e}`);
   }
-  function V(e) {
+  function b(e) {
     return e && e.DOTENV_KEY && e.DOTENV_KEY.length > 0 ? e.DOTENV_KEY : process.env.DOTENV_KEY && process.env.DOTENV_KEY.length > 0 ? process.env.DOTENV_KEY : "";
   }
-  function R(e, n) {
+  function j(e, n) {
     let r;
     try {
       r = new URL(n);
-    } catch (s) {
-      if (s.code === "ERR_INVALID_URL") {
-        const f = new Error("INVALID_DOTENV_KEY: Wrong format. Must be in valid uri format like dotenv://:key_1234@dotenvx.com/vault/.env.vault?environment=development");
-        throw f.code = "INVALID_DOTENV_KEY", f;
+    } catch (c) {
+      if (c.code === "ERR_INVALID_URL") {
+        const d = new Error("INVALID_DOTENV_KEY: Wrong format. Must be in valid uri format like dotenv://:key_1234@dotenvx.com/vault/.env.vault?environment=development");
+        throw d.code = "INVALID_DOTENV_KEY", d;
       }
-      throw s;
+      throw c;
     }
-    const a = r.password;
-    if (!a) {
-      const s = new Error("INVALID_DOTENV_KEY: Missing key part");
-      throw s.code = "INVALID_DOTENV_KEY", s;
+    const s = r.password;
+    if (!s) {
+      const c = new Error("INVALID_DOTENV_KEY: Missing key part");
+      throw c.code = "INVALID_DOTENV_KEY", c;
     }
-    const i = r.searchParams.get("environment");
-    if (!i) {
-      const s = new Error("INVALID_DOTENV_KEY: Missing environment part");
-      throw s.code = "INVALID_DOTENV_KEY", s;
+    const u = r.searchParams.get("environment");
+    if (!u) {
+      const c = new Error("INVALID_DOTENV_KEY: Missing environment part");
+      throw c.code = "INVALID_DOTENV_KEY", c;
     }
-    const t = `DOTENV_VAULT_${i.toUpperCase()}`, o = e.parsed[t];
+    const t = `DOTENV_VAULT_${u.toUpperCase()}`, o = e.parsed[t];
     if (!o) {
-      const s = new Error(`NOT_FOUND_DOTENV_ENVIRONMENT: Cannot locate environment ${t} in your .env.vault file.`);
-      throw s.code = "NOT_FOUND_DOTENV_ENVIRONMENT", s;
+      const c = new Error(`NOT_FOUND_DOTENV_ENVIRONMENT: Cannot locate environment ${t} in your .env.vault file.`);
+      throw c.code = "NOT_FOUND_DOTENV_ENVIRONMENT", c;
     }
-    return { ciphertext: o, key: a };
+    return { ciphertext: o, key: s };
   }
   function O(e) {
     let n = null;
     if (e && e.path && e.path.length > 0)
       if (Array.isArray(e.path))
         for (const r of e.path)
-          l.existsSync(r) && (n = r.endsWith(".vault") ? r : `${r}.vault`);
+          a.existsSync(r) && (n = r.endsWith(".vault") ? r : `${r}.vault`);
       else
         n = e.path.endsWith(".vault") ? e.path : `${e.path}.vault`;
     else
-      n = u.resolve(process.cwd(), ".env.vault");
-    return l.existsSync(n) ? n : null;
+      n = i.resolve(process.cwd(), ".env.vault");
+    return a.existsSync(n) ? n : null;
   }
-  function b(e) {
-    return e[0] === "~" ? u.join(p.homedir(), e.slice(1)) : e;
-  }
-  function j(e) {
-    !!(e && e.debug) && _("Loading env from encrypted .env.vault");
-    const r = c._parseVault(e);
-    let a = process.env;
-    return e && e.processEnv != null && (a = e.processEnv), c.populate(a, r, e), { parsed: r };
+  function T(e) {
+    return e[0] === "~" ? i.join(f.homedir(), e.slice(1)) : e;
   }
   function P(e) {
-    const n = u.resolve(process.cwd(), ".env");
+    !!(e && e.debug) && y("Loading env from encrypted .env.vault");
+    const r = l._parseVault(e);
+    let s = process.env;
+    return e && e.processEnv != null && (s = e.processEnv), l.populate(s, r, e), { parsed: r };
+  }
+  function B(e) {
+    const n = i.resolve(process.cwd(), ".env");
     let r = "utf8";
-    const a = !!(e && e.debug);
-    e && e.encoding ? r = e.encoding : a && _("No encoding is specified. UTF-8 is used by default");
-    let i = [n];
+    const s = !!(e && e.debug);
+    e && e.encoding ? r = e.encoding : s && y("No encoding is specified. UTF-8 is used by default");
+    let u = [n];
     if (e && e.path)
       if (!Array.isArray(e.path))
-        i = [b(e.path)];
+        u = [T(e.path)];
       else {
-        i = [];
-        for (const f of e.path)
-          i.push(b(f));
+        u = [];
+        for (const d of e.path)
+          u.push(T(d));
       }
     let t;
     const o = {};
-    for (const f of i)
+    for (const d of u)
       try {
-        const m = c.parse(l.readFileSync(f, { encoding: r }));
-        c.populate(o, m, e);
+        const m = l.parse(a.readFileSync(d, { encoding: r }));
+        l.populate(o, m, e);
       } catch (m) {
-        a && _(`Failed to load ${f} ${m.message}`), t = m;
+        s && y(`Failed to load ${d} ${m.message}`), t = m;
       }
-    let s = process.env;
-    return e && e.processEnv != null && (s = e.processEnv), c.populate(s, o, e), t ? { parsed: o, error: t } : { parsed: o };
+    let c = process.env;
+    return e && e.processEnv != null && (c = e.processEnv), l.populate(c, o, e), t ? { parsed: o, error: t } : { parsed: o };
   }
   function F(e) {
-    if (V(e).length === 0)
-      return c.configDotenv(e);
+    if (b(e).length === 0)
+      return l.configDotenv(e);
     const n = O(e);
-    return n ? c._configVault(e) : (Y(`You set DOTENV_KEY but you are missing a .env.vault file at ${n}. Did you forget to build it?`), c.configDotenv(e));
+    return n ? l._configVault(e) : (R(`You set DOTENV_KEY but you are missing a .env.vault file at ${n}. Did you forget to build it?`), l.configDotenv(e));
   }
   function M(e, n) {
     const r = Buffer.from(n.slice(-64), "hex");
-    let a = Buffer.from(e, "base64");
-    const i = a.subarray(0, 12), t = a.subarray(-16);
-    a = a.subarray(12, -16);
+    let s = Buffer.from(e, "base64");
+    const u = s.subarray(0, 12), t = s.subarray(-16);
+    s = s.subarray(12, -16);
     try {
-      const o = v.createDecipheriv("aes-256-gcm", r, i);
-      return o.setAuthTag(t), `${o.update(a)}${o.final()}`;
+      const o = g.createDecipheriv("aes-256-gcm", r, u);
+      return o.setAuthTag(t), `${o.update(s)}${o.final()}`;
     } catch (o) {
-      const s = o instanceof RangeError, f = o.message === "Invalid key length", m = o.message === "Unsupported state or unable to authenticate data";
-      if (s || f) {
-        const y = new Error("INVALID_DOTENV_KEY: It must be 64 characters long (or more)");
-        throw y.code = "INVALID_DOTENV_KEY", y;
+      const c = o instanceof RangeError, d = o.message === "Invalid key length", m = o.message === "Unsupported state or unable to authenticate data";
+      if (c || d) {
+        const _ = new Error("INVALID_DOTENV_KEY: It must be 64 characters long (or more)");
+        throw _.code = "INVALID_DOTENV_KEY", _;
       } else if (m) {
-        const y = new Error("DECRYPTION_FAILED: Please check your DOTENV_KEY");
-        throw y.code = "DECRYPTION_FAILED", y;
+        const _ = new Error("DECRYPTION_FAILED: Please check your DOTENV_KEY");
+        throw _.code = "DECRYPTION_FAILED", _;
       } else
         throw o;
     }
   }
   function U(e, n, r = {}) {
-    const a = !!(r && r.debug), i = !!(r && r.override);
+    const s = !!(r && r.debug), u = !!(r && r.override);
     if (typeof n != "object") {
       const t = new Error("OBJECT_REQUIRED: Please check the processEnv argument being passed to populate");
       throw t.code = "OBJECT_REQUIRED", t;
     }
     for (const t of Object.keys(n))
-      Object.prototype.hasOwnProperty.call(e, t) ? (i === !0 && (e[t] = n[t]), a && _(i === !0 ? `"${t}" is already defined and WAS overwritten` : `"${t}" is already defined and was NOT overwritten`)) : e[t] = n[t];
+      Object.prototype.hasOwnProperty.call(e, t) ? (u === !0 && (e[t] = n[t]), s && y(u === !0 ? `"${t}" is already defined and WAS overwritten` : `"${t}" is already defined and was NOT overwritten`)) : e[t] = n[t];
   }
-  const c = {
-    configDotenv: P,
-    _configVault: j,
-    _parseVault: L,
+  const l = {
+    configDotenv: B,
+    _configVault: P,
+    _parseVault: Y,
     config: F,
     decrypt: M,
-    parse: K,
+    parse: L,
     populate: U
   };
-  return d.exports.configDotenv = c.configDotenv, d.exports._configVault = c._configVault, d.exports._parseVault = c._parseVault, d.exports.config = c.config, d.exports.decrypt = c.decrypt, d.exports.parse = c.parse, d.exports.populate = c.populate, d.exports = c, d.exports;
+  return p.exports.configDotenv = l.configDotenv, p.exports._configVault = l._configVault, p.exports._parseVault = l._parseVault, p.exports.config = l.config, p.exports.decrypt = l.decrypt, p.exports.parse = l.parse, p.exports.populate = l.populate, p.exports = l, p.exports;
 }
-var X = z();
-const Z = /* @__PURE__ */ G(X), ee = k(import.meta.url), te = g.dirname(ee), re = g.join(te, "db", "tables", "KJV.json");
+var Z = X();
+const ee = /* @__PURE__ */ Q(Z), te = A(import.meta.url), re = h.dirname(te), ne = h.join(re, "db", "tables", "KJV.json");
 let w;
-async function ne(l, u) {
+const x = async () => {
+  if (!w) {
+    const a = await G.readFile(ne, "utf-8");
+    w = JSON.parse(a);
+  }
+};
+async function oe(a, i) {
   try {
-    if (!w) {
-      const h = await J.readFile(re, "utf-8");
-      w = JSON.parse(h);
-    }
-    const v = w.books.find((h) => h.name === l);
-    if (v && v.chapters instanceof Array) {
-      const h = v.chapters.find(
-        (E) => E.chapter === u
+    await x();
+    const g = w.books.find((v) => v.name === a);
+    if (g && g.chapters instanceof Array) {
+      const v = g.chapters.find(
+        (E) => E.chapter === i
       );
-      if (h) return h;
+      if (v) return v;
     }
     return console.log({ jsonLength: w.books.length }), null;
-  } catch (p) {
-    throw console.log(p), p;
+  } catch (f) {
+    throw console.log(f), f;
   }
 }
-const oe = k(import.meta.url), D = g.dirname(oe);
-Z.config();
-let $, N;
-B.whenReady().then(() => {
-  const l = S.getAllDisplays(), u = l.length > 1 ? l[1] : null;
-  if (console.log({ __dirname: D }), $ = new T({
+async function ae() {
+  try {
+    return await x(), w.books.map((i) => {
+      var f;
+      return {
+        name: i.name,
+        numberOfChapters: ((f = i == null ? void 0 : i.chapters) == null ? void 0 : f.length) ?? 0
+      };
+    });
+  } catch (a) {
+    throw console.log(a), a;
+  }
+}
+const se = A(import.meta.url), D = h.dirname(se);
+ee.config();
+let k, N;
+C.whenReady().then(() => {
+  const a = S.getAllDisplays(), i = a.length > 1 ? a[1] : null;
+  if (console.log({ __dirname: D }), k = new I({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: g.join(D, "preload.mjs")
+      preload: h.join(D, "preload.mjs")
     }
-  }), $.loadFile(g.join(D, "../dist/index.html"), {
+  }), k.loadFile(h.join(D, "../dist/index.html"), {
     hash: "/"
-  }), u) {
-    const { x: p, y: v, width: h, height: E } = u.bounds;
-    N = new T({
-      x: p,
-      y: v,
-      width: h,
+  }), i) {
+    const { x: f, y: g, width: v, height: E } = i.bounds;
+    N = new I({
+      x: f,
+      y: g,
+      width: v,
       height: E,
       fullscreen: !0,
       frame: !1,
       alwaysOnTop: !0,
       webPreferences: {
-        preload: g.join(D, "preload.mjs")
+        preload: h.join(D, "preload.mjs")
       }
-    }), console.log(`${l.length} monitor detected`), N.loadFile(g.join(D, "../dist/index.html"), {
+    }), console.log(`${a.length} monitor detected`), N.loadFile(h.join(D, "../dist/index.html"), {
       hash: "presentation"
     });
   } else
     console.log("Only one monitor detected");
 });
-A.handle("get-verse", (l, u, p) => ne(u, p));
-A.on("trigger-presentation", (l, u) => {
-  N && N.webContents.send("presentation-action", u);
+V.handle("get-verse", (a, i, f) => oe(i, f));
+V.handle("get-books", (a) => ae());
+V.on("trigger-presentation", (a, i) => {
+  N && N.webContents.send("presentation-action", i);
 });

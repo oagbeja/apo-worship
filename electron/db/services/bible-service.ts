@@ -33,16 +33,20 @@ interface IOutputVerse {
   //
 }
 
+const fetchJsonData = async () => {
+  if (!jsonData) {
+    const data = await fs.readFile(filePath, "utf-8");
+    jsonData = JSON.parse(data);
+  }
+};
+
 export async function getVerse(
   book: string,
   chapter: number
   // verse: number
 ): Promise<IOutputVerse | null> {
   try {
-    if (!jsonData) {
-      const data = await fs.readFile(filePath, "utf-8");
-      jsonData = JSON.parse(data);
-    }
+    await fetchJsonData();
     const books = jsonData.books;
     const actualBook = books.find((item) => item.name === book);
     // console.log({ actualBook });
@@ -57,6 +61,21 @@ export async function getVerse(
     console.log({ jsonLength: jsonData.books.length });
     return null;
     // return { book: "tell", chapter: 10, verse: 10, text: "" };
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+}
+
+export async function getBooks(): Promise<Record<string, any>[]> {
+  try {
+    await fetchJsonData();
+    const data = jsonData.books.map((item) => ({
+      name: item.name,
+      numberOfChapters: item?.chapters?.length ?? 0,
+    }));
+
+    return data;
   } catch (err) {
     console.log(err);
     throw err;
