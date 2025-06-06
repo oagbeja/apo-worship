@@ -1,0 +1,24 @@
+{
+  "name": "apo-worship-electron",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p ../tsconfig.electron.json && npm run copy-assets && npm run rebuild",
+     "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "copy-assets": "cpy \"db/tables/**/*\" \"dist/db/tables\" --parents",
+    "start": "npm run build && electron ."
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "dotenv": "^16.5.0",
+    "electron": "^36.4.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.1",
+    "@types/better-sqlite3": "^7.6.13",
+    "cpy": "^11.1.0",
+    "typescript": "^5.8.3"
+  }
+}

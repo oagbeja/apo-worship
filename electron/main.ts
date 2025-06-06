@@ -1,16 +1,16 @@
 import { app, BrowserWindow, ipcMain, screen } from "electron";
 import path from "path";
-import { fileURLToPath } from "url";
+// import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { getBooks, getVerse } from "./db/services/bible-service";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 dotenv.config();
-
+console.log("Electron main running");
 let controlWindow;
-let presentationWindow;
+let presentationWindow: any;
 
 app.whenReady().then(() => {
   const displays = screen.getAllDisplays();
@@ -25,11 +25,12 @@ app.whenReady().then(() => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs"),
+      preload: path.join(__dirname, "preload.js"),
     },
   });
   // controlWindow.loadURL(process.env.VITE_DEV_SERVER_URL); // Vite dev server or built file
-  controlWindow.loadFile(path.join(__dirname, "../dist/index.html"), {
+  console.log(path.join(__dirname, "../../dist/index.html"));
+  controlWindow.loadFile(path.join(__dirname, "../../dist/index.html"), {
     hash: "/",
   });
 
@@ -45,12 +46,12 @@ app.whenReady().then(() => {
       frame: false,
       alwaysOnTop: true,
       webPreferences: {
-        preload: path.join(__dirname, "preload.mjs"),
+        preload: path.join(__dirname, "preload.js"),
       },
     });
     console.log(`${displays.length} monitor detected`);
 
-    presentationWindow.loadFile(path.join(__dirname, "../dist/index.html"), {
+    presentationWindow.loadFile(path.join(__dirname, "../../dist/index.html"), {
       hash: "presentation",
     });
     // presentationWindow.loadURL(

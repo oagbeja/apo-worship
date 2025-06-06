@@ -1,12 +1,21 @@
-import { fileURLToPath } from "url";
+// import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs/promises";
+import Database from "better-sqlite3";
+import { app } from "electron";
 
 // Handle __dirname in ESM
-const filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(filename);
+// const filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(filename);
 
-const filePath = path.join(__dirname, "db", "tables", "KJV.json");
+// DB path
+const dbPath = path.resolve(__dirname, "../tables/kjv_.sqlite");
+console.log({ dbPath });
+// Connect
+// const db = new Database(dbPath);
+// db.pragma("journal_mode = WAL");
+
+const filePath = path.join(__dirname, "..", "tables", "KJV.json");
 let jsonData: Record<string, any[]>;
 
 interface Verse {
@@ -69,6 +78,18 @@ export async function getVerse(
 
 export async function getBooks(): Promise<Record<string, any>[]> {
   try {
+    const strPath = path.join(app.getPath("documents"), "Songs.db");
+    console.log({ strPath });
+    const db = new Database(strPath);
+    // const tables = db
+    //   .prepare("SELECT name FROM sqlite_master WHERE type='table'")
+    //   .all(); //metadata, book, verse/// revision song sqlite_sequence
+    //      { name: 'word_key' },
+    // { name: 'word_list' },
+    // { name: 'sqlite_sequence' }
+    const tables = db.prepare("SELECT * FROM song ").all();
+    console.log("Tables in DB:", tables); // replace `1` with the desired book ID
+
     await fetchJsonData();
     const data = jsonData.books.map((item) => ({
       name: item.name,
