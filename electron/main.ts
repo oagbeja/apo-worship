@@ -3,6 +3,7 @@ import path from "path";
 // import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { getBooks, getVerse } from "./db/services/bible-service";
+import { getSongTitles, getSongWords } from "./db/services/song-service";
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
@@ -71,6 +72,13 @@ ipcMain.handle("get-books", (event) => {
   return getBooks();
 });
 
+ipcMain.handle("get-song-titles", (event, srch?: string) => {
+  return getSongTitles(srch);
+});
+
+ipcMain.handle("get-song-words", (event, rowId) => {
+  return getSongWords(rowId);
+});
 ipcMain.on("trigger-presentation", (event, payload) => {
   // Forward to the presentation window
   if (presentationWindow) {

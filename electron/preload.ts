@@ -4,6 +4,8 @@ contextBridge.exposeInMainWorld("api", {
   getVerse: (book: string, chapter: number, verse: number) =>
     ipcRenderer.invoke("get-verse", book, chapter, verse),
   getBooks: () => ipcRenderer.invoke("get-books"),
+  getSongTitles: (srch?: string) => ipcRenderer.invoke("get-song-titles", srch),
+  getSongWords: (rowId: number) => ipcRenderer.invoke("get-song-words", rowId),
 });
 
 contextBridge.exposeInMainWorld("electron", {

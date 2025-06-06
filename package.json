@@ -3,14 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "build": "tsc -b && vite build",
-    "start": "npm run build && npm run postbuild:electron && electron . --unhandled-rejections=strict",
-    "postbuild:electron": "cpy electron/db/tables/*.* dist-electron/db/tables"
+    "build": "vite build"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
@@ -26,6 +21,7 @@
     "@eslint/js": "^9.25.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.5.1",
     "@vitejs/plugin-react-swc": "^3.9.0",
     "concurrently": "^9.1.2",
     "cpy-cli": "^5.0.0",

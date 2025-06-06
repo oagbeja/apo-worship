@@ -6,14 +6,17 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc -p ../tsconfig.electron.json && npm run copy-assets && npm run rebuild",
-     "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "rebuild": "electron-rebuild -f -w better-sqlite3",
     "copy-assets": "cpy \"db/tables/**/*\" \"dist/db/tables\" --parents",
-    "start": "npm run build && electron ."
+    "start": "npm run build && electron .",
+    "full-start": "cd .. && npm run build && cd electron && npm start"
   },
   "dependencies": {
+    "@iarna/rtf-to-html": "^1.1.0",
     "better-sqlite3": "^11.10.0",
     "dotenv": "^16.5.0",
-    "electron": "^36.4.0"
+    "electron": "^36.4.0",
+    "rtf-parser": "^1.3.3"
   },
   "devDependencies": {
     "@electron/rebuild": "^4.0.1",

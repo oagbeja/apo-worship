@@ -22,11 +22,13 @@ export default function SelectInput({
   selected,
   setSelected,
   bodyClass,
+  setQueryExternal,
 }: {
   options: IOptions[];
   handleChange: Function;
   selected: IOptions;
   setSelected: Function;
+  setQueryExternal?: Function;
   bodyClass?: string;
 }) {
   // const [selected, setSelected] = useState<IOptions>();
@@ -63,7 +65,10 @@ export default function SelectInput({
             <ComboboxInput
               className='w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:outline-none'
               displayValue={(option: typeof selected) => option?.title ?? ""}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setQueryExternal && setQueryExternal(e.target.value);
+              }}
               placeholder='Search option...'
             />
             <ComboboxButton className='absolute inset-y-0 right-0 flex items-center pr-1'>
@@ -78,7 +83,7 @@ export default function SelectInput({
                   key={option.id}
                   value={option}
                   className={({ active }) =>
-                    `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
+                    `relative cursor-pointer select-none py-2 pl-7 pr-4 ${
                       active ? "bg-blue-100 text-blue-900" : "text-gray-900"
                     }`
                   }
