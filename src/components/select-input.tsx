@@ -71,7 +71,7 @@ export default function SelectInput({
               }}
               placeholder='Search option...'
             />
-            <ComboboxButton className='absolute inset-y-0 right-0 flex items-center pr-1'>
+            <ComboboxButton className='absolute inset-y-0 right-0 flex items-center pr-1 cursor-pointer'>
               <ChevronDown className='h-4 w-4 text-gray-400' />
             </ComboboxButton>
           </div>
