@@ -3,7 +3,16 @@ import path from "path";
 // import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { getBooks, getVerse } from "./db/services/bible-service";
-import { getSongTitles, getSongWords } from "./db/services/song-service";
+import {
+  createSong,
+  deleteSong,
+  deleteTag,
+  getSongTitles,
+  getSongWords,
+  mergeFiles,
+  updateSong,
+} from "./db/services/song-service";
+import { uploadFile } from "./db/services/util-service";
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
@@ -30,10 +39,12 @@ app.whenReady().then(() => {
     },
   });
   // controlWindow.loadURL(process.env.VITE_DEV_SERVER_URL); // Vite dev server or built file
-  console.log(path.join(__dirname, "../../dist/index.html"));
-  controlWindow.loadFile(path.join(__dirname, "../../dist/index.html"), {
-    hash: "/",
-  });
+  console.log({ env: process.env });
+  controlWindow.loadURL("http://localhost:5173"); // Vite dev server or built file
+  // console.log(path.join(__dirname, "../../dist/index.html"));
+  // controlWindow.loadFile(path.join(__dirname, "../../dist/index.html"), {
+  //   hash: "/",
+  // });
 
   // Presentation window (on second display)
   if (secondaryDisplay) {
@@ -79,6 +90,31 @@ ipcMain.handle("get-song-titles", (event, srch?: string) => {
 ipcMain.handle("get-song-words", (event, rowId) => {
   return getSongWords(rowId);
 });
+
+ipcMain.handle("upload-file", (event, filename, content, type) => {
+  return uploadFile(filename, content, type);
+});
+
+ipcMain.handle("merge-files", (event, tag) => {
+  return mergeFiles(tag);
+});
+
+ipcMain.handle("create-song", (event, title, words) => {
+  return createSong(title, words);
+});
+
+ipcMain.handle("update-song", (event, title, words, tag) => {
+  return updateSong(title, words, tag);
+});
+
+ipcMain.handle("delete-song", (event, rowid) => {
+  return deleteSong(rowid);
+});
+
+ipcMain.handle("delete-tag", (event, tag) => {
+  return deleteTag(tag);
+});
+
 ipcMain.on("trigger-presentation", (event, payload) => {
   // Forward to the presentation window
   if (presentationWindow) {
