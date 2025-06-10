@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs/promises";
-import Database from "better-sqlite3";
-import { app } from "electron";
+// import Database from "better-sqlite3";
+// import { app } from "electron";
 
 const filePath = path.join(__dirname, "..", "tables", "KJV.json");
 let jsonData: Record<string, any[]>;
@@ -55,7 +55,7 @@ export async function getVerse(
 
       if (actualChapter) return actualChapter;
     }
-    console.log({ jsonLength: jsonData.books.length });
+    // console.log({ jsonLength: jsonData.books.length });
     return null;
     // return { book: "tell", chapter: 10, verse: 10, text: "" };
   } catch (err) {

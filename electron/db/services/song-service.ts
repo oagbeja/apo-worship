@@ -143,6 +143,11 @@ export const deleteTag = async (tag: string) => {
 
 export const createSong = (title: string, words: string) => {
   try {
+    const row: any = dbAposSongs
+      .prepare("SELECT * FROM songs where title = ? limit 1")
+      .get(title);
+    if (row) throw `This ${title} title already exist.`;
+
     dbAposSongs
       .prepare("INSERT INTO songs (title, words,tag) VALUES (?, ?, ?)")
       .run(title, words, "Internal");
@@ -154,6 +159,11 @@ export const createSong = (title: string, words: string) => {
 
 export const updateSong = (title: string, words: string, rowid: number) => {
   try {
+    const row: any = dbAposSongs
+      .prepare("SELECT * FROM songs where title = ? and  rowid <> ? limit 1")
+      .get(title, rowid);
+    if (row) throw `This ${title} title already exist.`;
+
     dbAposSongs
       .prepare("update songs set title = ? , words = ? where rowid = ?")
       .run(title, words, rowid);

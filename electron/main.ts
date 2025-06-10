@@ -19,7 +19,7 @@ import { uploadFile } from "./db/services/util-service";
 
 dotenv.config();
 console.log("Electron main running");
-let controlWindow;
+let controlWindow: any;
 let presentationWindow: any;
 
 app.whenReady().then(() => {
@@ -39,12 +39,12 @@ app.whenReady().then(() => {
     },
   });
   // controlWindow.loadURL(process.env.VITE_DEV_SERVER_URL); // Vite dev server or built file
-  console.log({ env: process.env });
-  controlWindow.loadURL("http://localhost:5173"); // Vite dev server or built file
+  // console.log({ env: process.env });
+  // controlWindow.loadURL("http://localhost:5173"); // Vite dev server or built file
   // console.log(path.join(__dirname, "../../dist/index.html"));
-  // controlWindow.loadFile(path.join(__dirname, "../../dist/index.html"), {
-  //   hash: "/",
-  // });
+  controlWindow.loadFile(path.join(__dirname, "../../dist/index.html"), {
+    hash: "/",
+  });
 
   // Presentation window (on second display)
   if (secondaryDisplay) {
@@ -66,9 +66,7 @@ app.whenReady().then(() => {
     presentationWindow.loadFile(path.join(__dirname, "../../dist/index.html"), {
       hash: "presentation",
     });
-    // presentationWindow.loadURL(
-    //   `${process.env.VITE_DEV_SERVER_URL}/presentation`
-    // ); // Or use React Router to route
+    // presentationWindow.loadURL(`http://localhost:5173/presentation`); // Or use React Router to route
   } else {
     console.log("Only one monitor detected");
   }
@@ -120,5 +118,12 @@ ipcMain.on("trigger-presentation", (event, payload) => {
   if (presentationWindow) {
     // console.log({ payload });
     presentationWindow.webContents.send("presentation-action", payload);
+  }
+});
+
+ipcMain.on("trigger-display", (event, payload) => {
+  if (controlWindow) {
+    // console.log({ payload });
+    controlWindow.webContents.send("display-action", payload);
   }
 });
