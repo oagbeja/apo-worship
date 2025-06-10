@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { IOutputVerse, IVerseUnit } from "../../global.dt";
 import SelectInput, { type IOptions } from "../../components/select-input";
+import CButton from "../../components/button";
 
 const Bible = () => {
   const [bibleText, setBibleText] = useState<IOutputVerse>();
@@ -12,6 +13,7 @@ const Bible = () => {
   const [formstateSel, setFormstateSel] = useState<Record<string, IOptions>>(
     {}
   );
+
   console.log({ formstate });
   const fetchVerse = async (book?: string, chapter?: number) => {
     book = book ?? String(formstate.book);
@@ -41,18 +43,40 @@ const Bible = () => {
     setFormstate({ ...formstate, [key]: val });
   };
 
-  const sendMessage = (item: IVerseUnit) =>
-    window.electron.ipcRenderer.send("trigger-presentation", {
-      title: item.name,
-      body: item.text,
-    });
+  // For sending message to the presentation layout...
+  // const sendMessage = (item: IVerseUnit) =>
+  //   window.electron.ipcRenderer.send("trigger-presentation", {
+  //     title: item.name,
+  //     body: item.text,
+  //   });
+
+  const sendToDisplay = () => {
+    if (bibleText) {
+      const arr = (bibleText?.verses ?? [])
+        .filter(
+          (item) =>
+            item.verse >= Number(formstate.verse) &&
+            (formstate.toVerse
+              ? item.verse <= Number(formstate.toVerse)
+              : item.verse == Number(formstate.verse))
+        )
+        .map((item) => ({
+          title: item.name,
+          body: item.text,
+        }));
+      window.electron.ipcRenderer.send("trigger-display", {
+        details: arr,
+        type: "bible",
+      });
+    }
+  };
 
   const renderLines = () => {
     if (!bibleText) return null;
     return bibleText.verses.map((item, index) => {
       return (
         <div
-          onClick={() => sendMessage(item)}
+          // onClick={() => sendMessage(item)}
           className={`flex gap-[10px] cursor-pointer border-[1px] ${
             item.verse >= Number(formstate.verse) &&
             (formstate.toVerse
@@ -110,9 +134,6 @@ const Bible = () => {
 
   const toVerseOptions = toVerseOptionsFn();
 
-  // useEffect(() => {
-  //   fetchVerse();
-  // }, []);
   useEffect(() => {
     fetchBooks();
   }, []);
@@ -151,46 +172,52 @@ const Bible = () => {
 
   return (
     <div className='container h-full '>
-      <div className='flex gap-[5px] items-center mb-5 h-[55px]'>
-        <SelectInput
-          options={bookOptions}
-          handleChange={(value: string) => onChangeHandler(value, "book")}
-          selected={formstateSel.book ?? bookOptions?.[0]}
-          setSelected={(val: IOptions) =>
-            setFormstateSel({ ...formstateSel, book: val })
-          }
-        />
-        {/* chapter */}
-        <SelectInput
-          options={chapterOptions}
-          handleChange={(value: string) => onChangeHandler(value, "chapter")}
-          setSelected={(val: IOptions) =>
-            setFormstateSel({ ...formstateSel, chapter: val })
-          }
-          selected={formstateSel.chapter ?? chapterOptions?.[0]}
-          bodyClass='w-20'
-        />
-        {/* Verse */}
-        <SelectInput
-          options={verseOptions}
-          handleChange={(value: string) => onChangeHandler(value, "verse")}
-          setSelected={(val: IOptions) =>
-            setFormstateSel({ ...formstateSel, verse: val })
-          }
-          selected={formstateSel.verse ?? verseOptions?.[0]}
-          bodyClass='w-20'
-        />
-        -TO-
-        {/* To Verse */}
-        <SelectInput
-          options={toVerseOptions}
-          handleChange={(value: string) => onChangeHandler(value, "toVerse")}
-          setSelected={(val: IOptions) =>
-            setFormstateSel({ ...formstateSel, toVerse: val })
-          }
-          selected={formstateSel.toVerse ?? toVerseOptions?.[0]}
-          bodyClass='w-20'
-        />
+      <div className='flex justify-between items-center w-full  mb-5'>
+        {" "}
+        <div className='flex gap-[5px] items-center h-[55px]'>
+          <SelectInput
+            options={bookOptions}
+            handleChange={(value: string) => onChangeHandler(value, "book")}
+            selected={formstateSel.book ?? bookOptions?.[0]}
+            setSelected={(val: IOptions) =>
+              setFormstateSel({ ...formstateSel, book: val })
+            }
+          />
+          {/* chapter */}
+          <SelectInput
+            options={chapterOptions}
+            handleChange={(value: string) => onChangeHandler(value, "chapter")}
+            setSelected={(val: IOptions) =>
+              setFormstateSel({ ...formstateSel, chapter: val })
+            }
+            selected={formstateSel.chapter ?? chapterOptions?.[0]}
+            bodyClass='w-20'
+          />
+          {/* Verse */}
+          <SelectInput
+            options={verseOptions}
+            handleChange={(value: string) => onChangeHandler(value, "verse")}
+            setSelected={(val: IOptions) =>
+              setFormstateSel({ ...formstateSel, verse: val })
+            }
+            selected={formstateSel.verse ?? verseOptions?.[0]}
+            bodyClass='w-20'
+          />
+          -TO-
+          {/* To Verse */}
+          <SelectInput
+            options={toVerseOptions}
+            handleChange={(value: string) => onChangeHandler(value, "toVerse")}
+            setSelected={(val: IOptions) =>
+              setFormstateSel({ ...formstateSel, toVerse: val })
+            }
+            selected={formstateSel.toVerse ?? toVerseOptions?.[0]}
+            bodyClass='w-20'
+          />
+        </div>
+        <div>
+          <CButton title='Push to Display' onClick={sendToDisplay} />
+        </div>
       </div>
 
       <div className=' flex flex-col gap-[2px] h-[calc(100%-65px)] overflow-auto '>

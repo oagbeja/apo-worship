@@ -2,14 +2,22 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   component?: React.ReactNode;
+  className?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, component }) => {
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  component,
+  className,
+}) => {
   if (!isOpen) return null;
 
   return (
     <div className='fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center z-50'>
-      <div className='bg-white rounded-lg shadow-lg w-96 p-6 relative'>
+      <div
+        className={`bg-white rounded-lg shadow-lg w-96 p-6 relative ${className}`}
+      >
         {/*
         <h2 className='text-xl font-semibold text-black mb-4'>Modal Title</h2>
          <p className=' text-black mb-4'>

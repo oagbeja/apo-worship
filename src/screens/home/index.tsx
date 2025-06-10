@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import BottomLayout from "../bottom-layout";
+import ProcessLayout from "../process-layout";
 
 export default function ResizableLayout() {
   const [leftWidth, setLeftWidth] = useState(200);
@@ -54,8 +55,8 @@ export default function ResizableLayout() {
         />
 
         {/* Middle */}
-        <div className='bg-green-100 p-2' style={{ width: middleWidth }}>
-          Middle
+        <div className='bg-white p-2' style={{ width: middleWidth }}>
+          <ProcessLayout />
         </div>
 
         {/* Resize handle between Middle and Right */}
@@ -75,7 +76,10 @@ export default function ResizableLayout() {
       />
 
       {/* Bottom */}
-      <div className='bg-brown-100 flex-1 p-4 overflow-hidden'>
+      <div
+        className='bg-brown-100 flex-1 p-4 overflow-hidden'
+        style={{ height: 200 }}
+      >
         <BottomLayout />
       </div>
     </div>

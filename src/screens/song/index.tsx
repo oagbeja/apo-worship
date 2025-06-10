@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
 import type { IOutputVerse, IVerseUnit } from "../../global.dt";
 import SelectInput, { type IOptions } from "../../components/select-input";
-import { rtfToPlainText, stripStyleTags } from "../../utils/format";
+import {
+  htmlTOArray,
+  rtfToPlainText,
+  stripStyleTags,
+} from "../../utils/format";
 import Button from "../../components/button";
 import Modal from "../../components/modal";
 import ImportSongs from "./import-songs";
 import ActionIcons from "../../components/action-icons";
 import DeleteComponent from "../../components/delete-component";
 import { toast } from "react-toastify";
+import AddSong from "./add-song";
 
 const Song = () => {
   const [songText, setSongText] = useState<Record<string, any>>();
@@ -26,7 +31,8 @@ const Song = () => {
 
   const handleCloseModal = async (val?: number) => {
     setOpenModal(false);
-    if (val) await fetchsongs();
+
+    if (val) await fetchsongs(false);
   };
 
   console.log({ formstate });
@@ -40,16 +46,16 @@ const Song = () => {
     if (songLyrics) setSongText(songLyrics);
   };
 
-  const fetchsongs = async () => {
-    const data = await window.api.getSongTitles(srch);
+  const fetchsongs = async (searchFlag = true) => {
+    const data = await window.api.getSongTitles(searchFlag ? srch : undefined);
     console.log({ data });
     if (data) {
       setSongs(data);
-      await fetchWords(data[0].rowid);
-      setFormstate({ songId: data[0].rowid });
+      await fetchWords(data[0]?.rowid);
+      setFormstate({ songId: data[0]?.rowid });
       setFormstateSel({
         ...formstateSel,
-        songId: { id: data[0].rowid, title: data[0].title },
+        songId: { id: data[0]?.rowid, title: data[0]?.title },
       });
     }
   };
@@ -73,6 +79,7 @@ const Song = () => {
         await handleCloseModal(1);
       }
     } catch (err) {
+      console.log(err);
       toast.error("Unable to delete the specified item");
     }
   };
@@ -89,9 +96,10 @@ const Song = () => {
     setOpenModal(true);
   };
 
-  const triggerEditSong = () => {};
-
-  const triggerEditTag = () => {};
+  const triggerEditSong = () => {
+    setOpenModal(true);
+    setModalOptions(4);
+  };
 
   const onChangeHandler = (val: string | number, key: string) => {
     setFormstate({ ...formstate, [key]: val });
@@ -102,6 +110,19 @@ const Song = () => {
       title: item.name,
       body: item.text,
     });
+
+  const sendToDisplay = () => {
+    if (songText) {
+      console.log("htmlSongs");
+      window.electron.ipcRenderer.send("trigger-display", {
+        details: htmlTOArray(songText?.words ?? "").map((item) => ({
+          title: item,
+        })),
+        title: songText.title,
+        type: "song",
+      });
+    }
+  };
 
   const renderLines = () => {
     console.log({ songText });
@@ -117,6 +138,17 @@ const Song = () => {
 
   const renderModal = () => {
     switch (modalOptions) {
+      case 4:
+        return (
+          <AddSong
+            closeModal={handleCloseModal}
+            rowid={songText?.rowid}
+            prevTitle={songText?.title}
+            prevWords={songText?.words}
+          />
+        );
+      case 3:
+        return <AddSong closeModal={handleCloseModal} />;
       case 2:
         return (
           <DeleteComponent
@@ -175,12 +207,27 @@ const Song = () => {
                 concern='Tag'
                 rowid={Number(formstate.songId)}
                 triggerDelete={triggerDeleteTag}
-                triggerEdit={triggerEditTag}
+                display={["delete"]}
               />
             </div>
           ) : null}
-          <Button title='Import New Songs' onClick={() => setOpenModal(true)} />
-          <Button title='Add Song' />
+          <Button
+            title='Import New Songs'
+            onClick={() => {
+              setOpenModal(true);
+              setModalOptions(1);
+            }}
+          />
+          <Button
+            title='Add Song'
+            onClick={() => {
+              setOpenModal(true);
+              setModalOptions(3);
+            }}
+          />
+          <div>
+            <Button title='Push to Display' onClick={sendToDisplay} />
+          </div>
         </div>
       </div>
       <div className='flex flex-col gap-[2px] h-[calc(100%-60px)] overflow-auto  '>
@@ -190,6 +237,7 @@ const Song = () => {
         />
       </div>
       <Modal
+        className={modalOptions >= 3 ? "w-[80%]" : ""}
         isOpen={openModal}
         onClose={handleCloseModal}
         component={renderModal()}
