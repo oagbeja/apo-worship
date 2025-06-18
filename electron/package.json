@@ -9,20 +9,40 @@
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "copy-assets": "cpy \"db/tables/**/*\" \"dist/db/tables\" --parents",
     "start": "npm run build && electron .",
-    "full-start": "cd .. && npm run build && cd electron && npm start"
+    "full-start": "cd .. && npm run build && cd electron && npm start",
+    "electron:build": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.apoworship.app",
+    "productName": "ApoWorship",
+    "files": [
+      "dist/**/*",                 
+      {
+        "from": "../dist",         
+        "to": "dist",              
+        "filter": ["**/*"]
+      }
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis"
+    }
   },
   "dependencies": {
     "@iarna/rtf-to-html": "^1.1.0",
     "better-sqlite3": "^11.10.0",
     "dotenv": "^16.5.0",
-    "electron": "^36.4.0",
     "rtf-parser": "^1.3.3",
     "rtf-to-html-converter": "^1.2.4"
   },
   "devDependencies": {
-    "@electron/rebuild": "^4.0.1",
     "@types/better-sqlite3": "^7.6.13",
     "cpy": "^11.1.0",
+    "electron": "^36.4.0",
+    "electron-builder": "^26.0.12",
     "typescript": "^5.8.3"
   }
 }

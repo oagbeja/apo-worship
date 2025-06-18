@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import { useQuill } from "react-quilljs";
+import Quill from "quill";
 // or const { useQuill } = require('react-quilljs');
 
 import "quill/dist/quill.snow.css"; // Add css for snow theme
@@ -11,43 +12,27 @@ interface ITextEditor {
   value: string;
 }
 const TextEditor = ({ setValue, value }: ITextEditor) => {
-  // const { quill, quillRef } = useQuill();
-  const theme = "snow";
-  // const theme = "bubble";
-
-  const modules = {
-    toolbar: [["bold", "italic", "underline"]],
-  };
-
-  const placeholder = "Compose an text...";
-
-  const formats = ["bold", "italic", "underline"];
-
-  const { quill, quillRef } = useQuill({
-    theme,
-    modules,
-    formats,
-    placeholder,
-  });
-
-  // // const theme = 'bubble';
-  // console.log({ quill }); // undefined > Quill Object
-  // console.log({ quillRef }); // { current: undefined } > { current: Quill Editor Reference }
+  const quillRef = useRef<HTMLDivElement | null>(null);
+  const quillInstanceRef = useRef<Quill | null>(null);
 
   useEffect(() => {
-    if (quill) {
-      // quill.clipboard.dangerouslyPasteHTML("<h1>React Hook for Quill!</h1>");
-      quill.clipboard.dangerouslyPasteHTML(value);
-      quill.on("text-change", (delta, oldDelta, source) => {
-        // console.log("Text change!");
-        // console.log(quill.getText()); // Get text only
-        // console.log(quill.getContents()); // Get delta contents
-        // console.log(quill.root.innerHTML); // Get innerHTML using quill use this
-        // console.log(quillRef.current.firstChild.innerHTML); // Get innerHTML using quillRef or this
-        setValue(quill.root.innerHTML);
+    if (quillRef.current && !quillInstanceRef.current) {
+      quillInstanceRef.current = new Quill(quillRef.current, {
+        theme: "snow",
+        modules: {
+          toolbar: [["bold", "italic", "underline"]],
+        },
+        placeholder: "Compose a text...",
+        formats: ["bold", "italic", "underline"],
+      });
+
+      quillInstanceRef.current.clipboard.dangerouslyPasteHTML(value);
+
+      quillInstanceRef.current.on("text-change", () => {
+        setValue(quillInstanceRef.current!.root.innerHTML);
       });
     }
-  }, [quill]);
+  }, [quillRef]);
 
   return (
     <div className='w-full h-full'>

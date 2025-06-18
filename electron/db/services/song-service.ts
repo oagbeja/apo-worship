@@ -1,10 +1,17 @@
 import path from "path";
 import fs from "fs/promises";
+import fs_ from "fs";
+
 import Database from "better-sqlite3";
 import { app } from "electron";
 import { convertRtfToHtml } from "../../utils/format";
 
-const aposPath = path.join(app.getPath("userData"), "ApoSongs.db");
+const dbPath = path.join(app.getPath("userData"), "Database");
+if (!fs_.existsSync(dbPath)) {
+  fs_.mkdirSync(dbPath);
+}
+
+const aposPath = path.join(dbPath, "ApoSongs.db");
 const dbAposSongs = new Database(aposPath);
 dbAposSongs
   .prepare(

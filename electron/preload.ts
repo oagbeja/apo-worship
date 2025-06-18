@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
+import { uploadImage } from "./db/services/image-services";
 
 contextBridge.exposeInMainWorld("api", {
   getVerse: (book: string, chapter: number, verse: number) =>
@@ -15,6 +16,10 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.invoke("create-song", title, words),
   updateSong: (title: string, words: string, rowid: number) =>
     ipcRenderer.invoke("update-song", title, words, rowid),
+  uploadImage: (buffer: Buffer, tag: string) =>
+    ipcRenderer.invoke("upload-image", buffer, tag),
+  getImages: (srch?: string) => ipcRenderer.invoke("get-images", srch),
+  deleteImage: (rowid: number) => ipcRenderer.invoke("delete-image", rowid),
 });
 
 contextBridge.exposeInMainWorld("electron", {

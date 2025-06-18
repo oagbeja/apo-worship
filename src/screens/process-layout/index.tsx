@@ -1,14 +1,31 @@
 import { useEffect, useState } from "react";
 import { IVerseUnit } from "../../global.dt";
+import CButton from "../../components/button";
+import Dropdown from "../../components/dropdown";
+import { Backpack, Camera, Image, Save, TextCursor } from "lucide-react";
+import Modal from "../../components/modal";
+import CColor from "./customize-color";
+import CameraList from "./camera-list";
 
 interface IPayload {
-  details: Record<string, any>[];
+  details?: Record<string, any>[];
   type: string;
   title?: string;
 }
+
+interface IPayloadMetadata extends IPayload {
+  metadata: boolean;
+  type: string;
+  value: string;
+}
 const ProcessLayout = () => {
   const [message, setMessage] = useState<IPayload>();
+  const [metadata, setMetadata] = useState<IPayloadMetadata>();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [modalOptions, setModalOptions] = useState(1);
+  const [cameraId, setCameraId] = useState("");
+  const [styleState, setStyleState] = useState<Record<string, string>>({});
 
   const strReplace = (str: string) => str.replace("&nbsp;", "");
   const handleActivate = (index: number) => {
@@ -33,7 +50,7 @@ const ProcessLayout = () => {
     let strHtml = "";
     switch (type) {
       case "bible":
-        strHtml = ` <div>
+        strHtml = ` <div >
                 <div class='text-3xl'>${item.title}</div>
                 <div class='text-7xl'>${item.body}</div>
             </div>`;
@@ -49,6 +66,7 @@ const ProcessLayout = () => {
 
     window.electron.ipcRenderer.send("trigger-presentation", {
       html: strHtml,
+      ...styleState,
     });
   };
   const renderLines = () => {
@@ -88,6 +106,53 @@ const ProcessLayout = () => {
         ));
     }
   };
+  const handleSubmitStyle = (name: string, value: string) => {
+    setStyleState({ ...styleState, [name]: value });
+    handleCloseModal();
+  };
+
+  const handleChangeCamera = (value: string) => {
+    setCameraId(value);
+    setStyleState({ ...styleState, cameraId: value });
+  };
+
+  const renderModal = () => {
+    switch (modalOptions) {
+      case 1:
+        return (
+          <CColor
+            handleSubmit={handleSubmitStyle}
+            title='Text'
+            name='text-color'
+          />
+        );
+      case 2:
+        return (
+          <CColor
+            handleSubmit={handleSubmitStyle}
+            title='Background'
+            name='background-color'
+          />
+        );
+      case 3:
+        return (
+          <CameraList
+            cameraId={cameraId}
+            setCameraId={handleChangeCamera}
+            closeModal={handleCloseModal}
+          />
+        );
+    }
+  };
+  const handleCloseModal = () => setOpenModal(false);
+  const handleClick = (val: number) => {
+    setModalOptions(val);
+    setOpenModal(true);
+  };
+
+  const isIPayload = (payload: IPayloadMetadata) => {
+    return ["song", "bible"].includes(payload.type);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -112,18 +177,85 @@ const ProcessLayout = () => {
   }, [activeIndex]);
 
   useEffect(() => {
-    window.electron.ipcRenderer.on("display-action", (payload: IPayload) => {
-      // if (payload.action === "nextVerse")
-      console.log({ payload });
-      setMessage(payload);
-    });
+    window.electron.ipcRenderer.on(
+      "display-action",
+      (payload: IPayloadMetadata) => {
+        // if (payload.action === "nextVerse")
+        if (isIPayload(payload)) {
+          setMessage(payload);
+        } else setMetadata(payload);
+
+        console.log({ payload }, isIPayload(payload));
+      }
+    );
   }, []);
+
+  useEffect(() => {
+    if (metadata?.type && metadata?.value)
+      setStyleState({ ...styleState, [metadata.type]: metadata.value });
+  }, [metadata]);
 
   return (
     <div className='text-black container h-full py-2 overflow-hidden'>
-      Process
+      <div className='flex gap-1 items-center justify-between'>
+        <div>Process</div>
+
+        <div className='flex'>
+          {" "}
+          <TextCursor
+            onClick={() => handleClick(1)}
+            className='w-5 h-5 cursor-pointer'
+          >
+            <title>Text Color</title>
+          </TextCursor>
+          <div
+            className='w-2 h-5'
+            style={{ background: styleState?.["text-color"] }}
+          ></div>
+        </div>
+
+        <div className='flex'>
+          {" "}
+          <Backpack
+            onClick={() => handleClick(2)}
+            className='w-5 h-5 cursor-pointer'
+          >
+            <title>Background Color</title>
+          </Backpack>
+          <div
+            className='w-2 h-5'
+            style={{ background: styleState?.["background-color"] }}
+          ></div>
+        </div>
+
+        {/* <Image className='w-5 h-5 cursor-pointer'>
+          <title>Background Image</title>
+        </Image> */}
+        <div className='flex'>
+          <Camera
+            className='w-5 h-5 cursor-pointer'
+            onClick={() => handleClick(3)}
+          >
+            <title>Set Camera</title>
+          </Camera>
+          <div
+            className='w-2 h-5'
+            style={{ background: cameraId ? "blue" : undefined }}
+          ></div>
+        </div>
+
+        <Save className='w-5 h-5 cursor-pointer'>
+          <title>Save to Schedule</title>
+        </Save>
+      </div>
       <div>{message?.title ?? ""}</div>
       <div className='overflow-auto h-[90%]'>{renderLines()}</div>
+      <Modal
+        className={modalOptions < 3 ? "w-[fit-content]" : ""}
+        isOpen={openModal}
+        onClose={handleCloseModal}
+        component={renderModal()}
+      />
     </div>
   );
 };

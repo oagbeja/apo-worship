@@ -1,4 +1,4 @@
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Upload } from "lucide-react";
 
 interface IActionIcons {
   className?: string;
@@ -6,6 +6,7 @@ interface IActionIcons {
   rowid: number;
   triggerEdit?: (id: number) => void;
   triggerDelete?: (id: number) => void;
+  triggerDisplay?: (id: number) => void;
   display?: string[];
 }
 const ActionIcons: React.FC<IActionIcons> = ({
@@ -14,6 +15,7 @@ const ActionIcons: React.FC<IActionIcons> = ({
   rowid,
   triggerEdit,
   triggerDelete,
+  triggerDisplay,
   display = ["edit", "delete"],
 }) => {
   return (
@@ -25,6 +27,14 @@ const ActionIcons: React.FC<IActionIcons> = ({
         >
           <title>{`Edit ${concern ?? ""}`}</title>
         </Edit>
+      )}
+      {display.includes("display") && (
+        <Upload
+          className={`w-3 h-3 text-blue-500 cursor-pointer hover:text-blue-700 ${className}`}
+          onClick={() => triggerDisplay && triggerDisplay(rowid)}
+        >
+          <title>{`Push to Display ${concern ?? ""}`}</title>
+        </Upload>
       )}
       {display.includes("delete") && (
         <Trash2

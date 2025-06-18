@@ -27,6 +27,9 @@ declare global {
       mergeFiles(tag: string): Promise<boolean>;
       createSong(title: string, words: string): Promise<boolean>;
       updateSong(title: string, words: string, rowid: number): Promise<boolean>;
+      uploadImage(buffer: Buffer, tag: string): Promise<boolean>;
+      getImages(srch?: string): Promise<Record<string, any>[]>;
+      deleteImage(rowid: number): Promise<boolean>;
     };
     electron: {
       ipcRenderer: {

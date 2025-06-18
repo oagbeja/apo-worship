@@ -1,7 +1,8 @@
-import TextEditor from "../../components/text-editor";
+// import TextEditor from "../../components/text-editor";
 
 const ThemePage = () => {
-  return <TextEditor />;
+  return <></>;
+  // return <TextEditor />;
 };
 
 export default ThemePage;

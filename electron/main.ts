@@ -13,6 +13,11 @@ import {
   updateSong,
 } from "./db/services/song-service";
 import { uploadFile } from "./db/services/util-service";
+import {
+  deleteImage,
+  getImages,
+  uploadImage,
+} from "./db/services/image-services";
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
@@ -111,6 +116,18 @@ ipcMain.handle("delete-song", (event, rowid) => {
 
 ipcMain.handle("delete-tag", (event, tag) => {
   return deleteTag(tag);
+});
+
+ipcMain.handle("upload-image", (event, buffer, tag) => {
+  return uploadImage(buffer, tag);
+});
+
+ipcMain.handle("get-images", (event, srch) => {
+  return getImages(srch);
+});
+
+ipcMain.handle("delete-image", (event, rowid) => {
+  return deleteImage(rowid);
 });
 
 ipcMain.on("trigger-presentation", (event, payload) => {

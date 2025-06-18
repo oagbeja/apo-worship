@@ -1,3 +1,5 @@
+import { Area } from "react-easy-crop";
+
 export const rtfToPlainText = (rtf: string): string => {
   return rtf
     .replace(/\\par[d]?/g, "\n") // Convert paragraph tags to newlines
@@ -47,4 +49,44 @@ export const htmlTOArray = (htmlContent: string) => {
   // Filter out truly empty lines
   const cleaned = lines.filter((line) => line !== "");
   return cleaned;
+};
+
+export const compressImageWithoutResizing = async (
+  imageSrc: string,
+  crop: Area,
+  quality = 0.8 // tweak between 0.7–0.9 for smaller size with good quality
+): Promise<Blob> => {
+  const image = new Image();
+  image.src = imageSrc;
+  await new Promise((resolve) => (image.onload = resolve));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = crop.width;
+  canvas.height = crop.height;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas context not available");
+
+  ctx.drawImage(
+    image,
+    crop.x,
+    crop.y,
+    crop.width,
+    crop.height,
+    0,
+    0,
+    crop.width,
+    crop.height
+  );
+
+  return new Promise((resolve) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) throw new Error("Compression failed");
+        resolve(blob);
+      },
+      "image/jpeg", // use 'image/webp' if you want better compression
+      quality
+    );
+  });
 };
