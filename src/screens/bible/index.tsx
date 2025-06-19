@@ -67,6 +67,11 @@ const Bible = () => {
       window.electron.ipcRenderer.send("trigger-display", {
         details: arr,
         type: "bible",
+        title: `${arr[0].title}${
+          Number(formstate.toVerse) > Number(formstate.verse)
+            ? `-${Number(formstate.toVerse)}`
+            : ""
+        }`,
       });
     }
   };

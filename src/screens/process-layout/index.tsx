@@ -11,6 +11,7 @@ interface IPayload {
   details?: Record<string, any>[];
   type: string;
   title?: string;
+  scheduleId?: string;
 }
 
 interface IPayloadMetadata extends IPayload {
@@ -36,6 +37,7 @@ const ProcessLayout = () => {
   const items = (
     message?.details instanceof Array ? message.details : []
   ).filter((item) => item.title && !!strReplace(item.title));
+
   const triggerAction = (index: number) => {
     const item = items[index];
     console.log("Activated:", item);
@@ -69,6 +71,7 @@ const ProcessLayout = () => {
       ...styleState,
     });
   };
+
   const renderLines = () => {
     if (!message?.type) return null;
     switch (message.type) {
@@ -106,6 +109,7 @@ const ProcessLayout = () => {
         ));
     }
   };
+
   const handleSubmitStyle = (name: string, value: string) => {
     setStyleState({ ...styleState, [name]: value });
     handleCloseModal();
@@ -144,10 +148,40 @@ const ProcessLayout = () => {
         );
     }
   };
+
   const handleCloseModal = () => setOpenModal(false);
+
   const handleClick = (val: number) => {
     setModalOptions(val);
     setOpenModal(true);
+  };
+
+  const saveToSchedule = () => {
+    if (!message) return;
+    let scheduleId = message?.scheduleId;
+    if (!scheduleId) {
+      scheduleId = `schedule_${new Date().getTime()}`;
+      setMessage({ ...message, scheduleId });
+    }
+
+    const objToSend = { ...styleState, ...message };
+    const getTitle = () => {
+      switch (message.type) {
+        case "bible":
+          return `Bible -> ${message?.title} `;
+        case "song":
+          return `Song -> ${message?.title} `;
+        default:
+          return "";
+      }
+    };
+
+    window.electron.ipcRenderer.send("trigger-schedule", {
+      value: objToSend,
+      type: message.type,
+      scheduleId,
+      title: getTitle(),
+    });
   };
 
   const isIPayload = (payload: IPayloadMetadata) => {
@@ -183,6 +217,18 @@ const ProcessLayout = () => {
         // if (payload.action === "nextVerse")
         if (isIPayload(payload)) {
           setMessage(payload);
+          const arr = [
+            "cameraId",
+            "background-color",
+            "text-color",
+            "background-image",
+          ];
+          const payloadClone: Record<string, any> = { ...payload };
+          let obj: Record<string, any> = {};
+          for (let item of arr) {
+            if (payloadClone[item]) obj[item] = payloadClone[item];
+          }
+          setStyleState({ ...styleState, ...obj });
         } else setMetadata(payload);
 
         console.log({ payload }, isIPayload(payload));
@@ -244,7 +290,7 @@ const ProcessLayout = () => {
           ></div>
         </div>
 
-        <Save className='w-5 h-5 cursor-pointer'>
+        <Save className='w-5 h-5 cursor-pointer' onClick={saveToSchedule}>
           <title>Save to Schedule</title>
         </Save>
       </div>

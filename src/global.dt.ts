@@ -35,6 +35,7 @@ declare global {
       ipcRenderer: {
         send: Function;
         on: Function;
+        removeListener: Function;
       };
     };
   }

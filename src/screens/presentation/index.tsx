@@ -10,13 +10,29 @@ interface IPayload {
   cameraId?: string;
 }
 
-const Presentation = () => {
+interface IPresentation {
+  width?: string;
+  height?: string;
+  prose?: boolean;
+}
+
+const Presentation = ({
+  width = "100vw",
+  height = "100vh",
+  prose = true,
+}: IPresentation) => {
   const [message, setMessage] = useState<IPayload>();
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const displayMessage = () => {
     if (!message?.html) return "";
-    return message.html;
+    const removeXL = (html: string) => {
+      if (!prose) {
+        return html.replace(/\btext-(xs|sm|base|\d+xl)\b/g, "");
+      }
+      return html;
+    };
+    return removeXL(message.html);
     // return  (
     //   <div>
     //     <div className='text-sm'>{message.title}</div>
@@ -85,7 +101,7 @@ const Presentation = () => {
     <div
       className={
         message?.cameraId
-          ? "relative w-[100vw] h-[100vh]  aspect-video mx-auto  rounded overflow-hidden bg-black shadow"
+          ? `relative w-[${width}] h-[${height}]  aspect-video mx-auto  rounded overflow-hidden bg-black shadow`
           : ""
       }
     >
@@ -102,7 +118,7 @@ const Presentation = () => {
         className={
           message?.cameraId
             ? "absolute bottom-0 text-white left-0 right-0 flex justify-center p-6 bg-gradient-to-t from-black/80 to-transparent"
-            : "  text-white w-[100vw] flex flex-col justify-center items-center h-[100vh]"
+            : `  text-white w-[${width}] h-[${height}] flex flex-col justify-center items-center `
         }
         style={{
           color: message?.["text-color"],
@@ -112,7 +128,7 @@ const Presentation = () => {
         }}
       >
         <div
-          className='prose max-w-none '
+          className={`${prose ? "prose" : ""} max-w-none `}
           dangerouslySetInnerHTML={{ __html: displayMessage() }}
         />
       </div>

@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain, screen } from "electron";
+import { app, BrowserWindow, ipcMain, screen, Menu, MenuItem } from "electron";
 import path from "path";
+import fs from "fs";
 // import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { getBooks, getVerse } from "./db/services/bible-service";
@@ -18,14 +19,18 @@ import {
   getImages,
   uploadImage,
 } from "./db/services/image-services";
+import menuTemplate from "./utils/menu-list";
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
 
 dotenv.config();
 console.log("Electron main running");
+
 let controlWindow: any;
 let presentationWindow: any;
+
+let saveMenuItem: MenuItem;
 
 app.whenReady().then(() => {
   const displays = screen.getAllDisplays();
@@ -47,6 +52,16 @@ app.whenReady().then(() => {
   // console.log({ env: process.env });
   // controlWindow.loadURL("http://localhost:5173"); // Vite dev server or built file
   // console.log(path.join(__dirname, "../../dist/index.html"));
+
+  const menu = Menu.buildFromTemplate(menuTemplate);
+
+  Menu.setApplicationMenu(menu);
+
+  // Get reference to the "Save File" menu item
+  saveMenuItem = menu.items[0].submenu!.items.find(
+    (i) => i.label === "Save File"
+  )!;
+
   controlWindow.loadFile(path.join(__dirname, "../../dist/index.html"), {
     hash: "/",
   });
@@ -136,11 +151,38 @@ ipcMain.on("trigger-presentation", (event, payload) => {
     // console.log({ payload });
     presentationWindow.webContents.send("presentation-action", payload);
   }
+  if (controlWindow) {
+    // console.log({ payload });
+    controlWindow.webContents.send("presentation-action", payload);
+  }
 });
 
 ipcMain.on("trigger-display", (event, payload) => {
   if (controlWindow) {
     // console.log({ payload });
     controlWindow.webContents.send("display-action", payload);
+  }
+});
+
+ipcMain.on("trigger-schedule", (event, payload) => {
+  if (controlWindow) {
+    // console.log({ payload });
+    controlWindow.webContents.send("schedule-action", payload);
+  }
+});
+
+ipcMain.on("set-save-enabled", (event, isEnabled: boolean) => {
+  if (saveMenuItem) {
+    saveMenuItem.enabled = isEnabled;
+  }
+});
+
+ipcMain.on("save-to-path", (event, { filePath, content }) => {
+  try {
+    const json = JSON.stringify(content, null, 2); // pretty format
+    fs.writeFileSync(filePath, json, "utf-8");
+    controlWindow.webContents.send("save-success", path.basename(filePath));
+  } catch {
+    controlWindow.webContents.send("save-error");
   }
 });
