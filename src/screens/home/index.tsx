@@ -68,7 +68,7 @@ export default function ResizableLayout() {
         />
 
         {/* Right (flexes to fill remaining space) bg-purple-100 */}
-        <div className=' p-2 flex-1'>
+        <div className=' p-2 flex-1 overflow-hidden'>
           <Preview />
         </div>
       </div>

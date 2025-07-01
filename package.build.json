@@ -1,7 +1,17 @@
 {
   "name": "apo-worship",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "APO Worship",
+  "author": {
+    "name": "Joshua Agbeja",
+    "email": "talktogbenga@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "Sam Adio"
+    }
+  ],
   "main": "electron/dist/main.js",
   "scripts": {
     "dev": "vite",
@@ -13,6 +23,7 @@
     "productName": "ApoWorship",
     "compression": "maximum",
     "asar": true,
+    "icon": "public/icon.png",
     "files": [
       "dist/",
       "electron/dist/",

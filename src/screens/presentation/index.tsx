@@ -101,10 +101,22 @@ const Presentation = ({
     <div
       className={
         message?.cameraId
-          ? `relative w-[${width}] h-[${height}]  aspect-video mx-auto  rounded overflow-hidden bg-black shadow`
+          ? `relative w-[${width}] h-[${height}]  aspect-video mx-auto  rounded overflow-hidden  shadow`
           : ""
       }
     >
+      <div
+        style={{
+          backgroundColor: message?.["background-color"],
+          position: "absolute",
+          zIndex: -1,
+          top: 0,
+          width: "100%",
+          height: "100%",
+          overflow: "hidden",
+          ...styleBackgroundImage,
+        }}
+      />
       {/* Video will show only if camera is available */}
       {message?.cameraId && (
         <video
@@ -120,23 +132,15 @@ const Presentation = ({
             ? "absolute bottom-0 text-white left-0 right-0 flex justify-center p-6 bg-gradient-to-t from-black/80 to-transparent"
             : `  text-white w-[${width}] h-[${height}] flex flex-col justify-center items-center `
         }
-        style={{
-          color: message?.["text-color"],
-          backgroundColor: message?.["background-color"],
-
-          ...styleBackgroundImage,
-        }}
+        style={{ color: message?.["text-color"] }}
       >
         <div
           className={`${prose ? "prose" : ""} max-w-none `}
           dangerouslySetInnerHTML={{ __html: displayMessage() }}
         />
       </div>
-
-      {/* Overlay text (always visible) */}
     </div>
   );
-  // return <div className='container '>{displayMessage()}</div>;
 };
 
 export default Presentation;

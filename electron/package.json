@@ -4,6 +4,16 @@
   "private": true,
   "main": "dist/main.js",
   "type": "commonjs",
+   "author": {
+    "name": "Joshua Agbeja",
+    "email": "talktogbenga@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "Sam Adio"
+      
+    }
+  ],
   "scripts": {
     "build": "tsc -p ../tsconfig.electron.json && npm run copy-assets && npm run rebuild",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
@@ -27,6 +37,7 @@
     "directories": {
       "output": "release"
     },
+    "icon": "../public/icon.png",
     "win": {
       "target": "nsis"
     }
