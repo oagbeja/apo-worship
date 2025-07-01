@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { IOutputVerse, IVerseUnit } from "../../global.dt";
 import SelectInput, { type IOptions } from "../../components/select-input";
 import CButton from "../../components/button";
+import { Monitor, Save } from "lucide-react";
 
 const Bible = () => {
   const [bibleText, setBibleText] = useState<IOutputVerse>();
@@ -43,14 +44,7 @@ const Bible = () => {
     setFormstate({ ...formstate, [key]: val });
   };
 
-  // For sending message to the presentation layout...
-  // const sendMessage = (item: IVerseUnit) =>
-  //   window.electron.ipcRenderer.send("trigger-presentation", {
-  //     title: item.name,
-  //     body: item.text,
-  //   });
-
-  const sendToDisplay = () => {
+  const sendToDisplay = (schedule = false) => {
     if (bibleText) {
       const arr = (bibleText?.verses ?? [])
         .filter(
@@ -65,6 +59,7 @@ const Bible = () => {
           body: item.text,
         }));
       window.electron.ipcRenderer.send("trigger-display", {
+        schedule,
         details: arr,
         type: "bible",
         title: `${arr[0].title}${
@@ -74,6 +69,10 @@ const Bible = () => {
         }`,
       });
     }
+  };
+
+  const sendToSchedule = () => {
+    sendToDisplay(true);
   };
 
   const renderLines = () => {
@@ -221,7 +220,22 @@ const Bible = () => {
           />
         </div>
         <div>
-          <CButton title='Push to Display' onClick={sendToDisplay} />
+          <CButton
+            icon={
+              <Monitor>
+                <title>Push to Display</title>
+              </Monitor>
+            }
+            onClick={() => sendToDisplay()}
+          />
+          <CButton
+            icon={
+              <Save>
+                <title>Push to Schedule</title>
+              </Save>
+            }
+            onClick={sendToSchedule}
+          />
         </div>
       </div>
 

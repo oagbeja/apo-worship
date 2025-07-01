@@ -13,6 +13,7 @@ import ActionIcons from "../../components/action-icons";
 import DeleteComponent from "../../components/delete-component";
 import { toast } from "react-toastify";
 import AddSong from "./add-song";
+import { Download, Monitor, PlusCircle, Save } from "lucide-react";
 
 const Song = () => {
   const [songText, setSongText] = useState<Record<string, any>>();
@@ -105,13 +106,13 @@ const Song = () => {
     setFormstate({ ...formstate, [key]: val });
   };
 
-  const sendMessage = (item: IVerseUnit) =>
-    window.electron.ipcRenderer.send("trigger-presentation", {
-      title: item.name,
-      body: item.text,
-    });
+  // const sendMessage = (item: IVerseUnit) =>
+  //   window.electron.ipcRenderer.send("trigger-presentation", {
+  //     title: item.name,
+  //     body: item.text,
+  //   });
 
-  const sendToDisplay = () => {
+  const sendToDisplay = (schedule = false) => {
     if (songText) {
       console.log("htmlSongs");
       window.electron.ipcRenderer.send("trigger-display", {
@@ -120,8 +121,13 @@ const Song = () => {
         })),
         title: songText.title,
         type: "song",
+        schedule,
       });
     }
+  };
+
+  const sendToSchedule = () => {
+    sendToDisplay(true);
   };
 
   const renderLines = () => {
@@ -211,23 +217,45 @@ const Song = () => {
               />
             </div>
           ) : null}
+
           <Button
-            title='Import New Songs'
+            icon={
+              <Download>
+                <title>Import New Songs</title>
+              </Download>
+            }
             onClick={() => {
               setOpenModal(true);
               setModalOptions(1);
             }}
           />
           <Button
-            title='Add Song'
+            icon={
+              <PlusCircle>
+                <title>Add Song</title>
+              </PlusCircle>
+            }
             onClick={() => {
               setOpenModal(true);
               setModalOptions(3);
             }}
           />
-          <div>
-            <Button title='Push to Display' onClick={sendToDisplay} />
-          </div>
+          <Button
+            icon={
+              <Monitor>
+                <title>Push to Display</title>
+              </Monitor>
+            }
+            onClick={() => sendToDisplay()}
+          />
+          <Button
+            icon={
+              <Save>
+                <title>Push to Schedule</title>
+              </Save>
+            }
+            onClick={sendToSchedule}
+          />
         </div>
       </div>
       <div className='flex flex-col gap-[2px] h-[calc(100%-60px)] overflow-auto  '>

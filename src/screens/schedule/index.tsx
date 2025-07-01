@@ -130,8 +130,8 @@ const Schedule = () => {
   }, [scheduleItems]);
 
   return (
-    <div className='text-black container h-full py-2 overflow-hidden'>
-      <div className='flex gap-1 items-center justify-between'>
+    <div className=' container h-full py-2 overflow-hidden'>
+      <div className='flex gap-1 w-full items-center justify-between bg-[#191970] px-2 '>
         <div>Schedule</div>
         <div>{fileSavedPath}</div>
       </div>

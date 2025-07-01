@@ -1,10 +1,11 @@
 import { Button } from "@headlessui/react";
 
 interface IButton extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  title: string;
+  title?: string;
+  icon?: React.ReactNode;
 }
 
-const CButton = ({ title, disabled, className, ...rest }: IButton) => {
+const CButton = ({ title, disabled, className, icon, ...rest }: IButton) => {
   return (
     <Button
       disabled={disabled}
@@ -17,6 +18,7 @@ const CButton = ({ title, disabled, className, ...rest }: IButton) => {
         } ${className}`}
     >
       {title}
+      {icon}
     </Button>
   );
 };

@@ -15,12 +15,22 @@ const CColor = ({ handleSubmit, title, name }: IColor) => {
       <div className='flex flex-col gap-1'>
         <h2 className='text-xl font-semibold text-black '>{title} Color</h2>
         <ColorPicker color={color} setColor={setColor} />
-        <CButton
-          title='Submit'
-          onClick={() => {
-            handleSubmit(name, color);
-          }}
-        />
+        <div className='flex justify-between w-full'>
+          <CButton
+            title='Clear'
+            onClick={() => {
+              handleSubmit(name, "");
+            }}
+            className='w-[30%] bg-gray-300'
+          />
+          <CButton
+            title='Submit'
+            onClick={() => {
+              handleSubmit(name, color);
+            }}
+            className='w-[60%]'
+          />
+        </div>
       </div>
     </div>
   );

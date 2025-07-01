@@ -45,45 +45,42 @@ export default function ResizableLayout() {
     >
       {/* Top Section (resizable vertically) */}
       <div className='flex' style={{ height: topHeight }}>
-        {/* Left */}
-        <div className='bg-blue-100 p-2' style={{ width: leftWidth }}>
+        {/* Left bg-blue-100*/}
+        <div className=' p-2' style={{ width: leftWidth }}>
           <Schedule />
         </div>
 
-        {/* Resize handle between Left and Middle */}
+        {/* Resize handle between Left and Middlebg-gray-400 */}
         <div
-          className='w-1 bg-gray-400 cursor-col-resize'
+          className='w-1 bg-white  cursor-col-resize'
           onMouseDown={startResize("x1")}
         />
 
-        {/* Middle */}
-        <div className='bg-white p-2' style={{ width: middleWidth }}>
+        {/* Middle bg-white */}
+        <div className=' p-2' style={{ width: middleWidth }}>
           <ProcessLayout />
         </div>
 
-        {/* Resize handle between Middle and Right */}
+        {/* Resize handle between Middle and Right bg-gray-400 */}
         <div
-          className='w-1 bg-gray-400 cursor-col-resize'
+          className='w-1 bg-white cursor-col-resize'
           onMouseDown={startResize("x2")}
         />
 
-        {/* Right (flexes to fill remaining space) */}
-        <div className='bg-purple-100 p-2 flex-1'>
+        {/* Right (flexes to fill remaining space) bg-purple-100 */}
+        <div className=' p-2 flex-1'>
           <Preview />
         </div>
       </div>
 
       {/* Horizontal Resizer for Bottom */}
       <div
-        className='h-1 w-full bg-gray-400 cursor-row-resize'
+        className='h-1 w-full bg-white cursor-row-resize'
         onMouseDown={startResize("y")}
       />
 
       {/* Bottom */}
-      <div
-        className='bg-brown-100 flex-1 p-4 overflow-hidden'
-        style={{ height: 200 }}
-      >
+      <div className='flex-1 p-4 overflow-hidden' style={{ height: 200 }}>
         <BottomLayout />
       </div>
     </div>

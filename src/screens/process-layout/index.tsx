@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { IVerseUnit } from "../../global.dt";
 import CButton from "../../components/button";
 import Dropdown from "../../components/dropdown";
-import { Backpack, Camera, Image, Save, TextCursor } from "lucide-react";
+import { Backpack, Camera, Image, Save, TextCursor, Type } from "lucide-react";
 import Modal from "../../components/modal";
 import CColor from "./customize-color";
 import CameraList from "./camera-list";
@@ -18,6 +18,7 @@ interface IPayloadMetadata extends IPayload {
   metadata: boolean;
   type: string;
   value: string;
+  schedule?: boolean;
 }
 const ProcessLayout = () => {
   const [message, setMessage] = useState<IPayload>();
@@ -156,21 +157,26 @@ const ProcessLayout = () => {
     setOpenModal(true);
   };
 
-  const saveToSchedule = () => {
-    if (!message) return;
-    let scheduleId = message?.scheduleId;
+  const saveToSchedule = (payload?: IPayloadMetadata) => {
+    if (!message && !payload) return;
+    let objToUse: IPayload | undefined = payload ?? message;
+    if (!objToUse) return;
+    let scheduleId = objToUse?.scheduleId;
     if (!scheduleId) {
       scheduleId = `schedule_${new Date().getTime()}`;
-      setMessage({ ...message, scheduleId });
+      setMessage((prevState) => {
+        if (objToUse) return { ...objToUse, scheduleId };
+        return prevState && { ...prevState, scheduleId };
+      });
     }
 
     const objToSend = { ...styleState, ...message };
     const getTitle = () => {
-      switch (message.type) {
+      switch (objToUse.type) {
         case "bible":
-          return `Bible -> ${message?.title} `;
+          return `Bible -> ${objToUse?.title} `;
         case "song":
-          return `Song -> ${message?.title} `;
+          return `Song -> ${objToUse?.title} `;
         default:
           return "";
       }
@@ -178,7 +184,7 @@ const ProcessLayout = () => {
 
     window.electron.ipcRenderer.send("trigger-schedule", {
       value: objToSend,
-      type: message.type,
+      type: objToUse.type,
       scheduleId,
       title: getTitle(),
     });
@@ -211,29 +217,30 @@ const ProcessLayout = () => {
   }, [activeIndex]);
 
   useEffect(() => {
-    window.electron.ipcRenderer.on(
-      "display-action",
-      (payload: IPayloadMetadata) => {
-        // if (payload.action === "nextVerse")
-        if (isIPayload(payload)) {
-          setMessage(payload);
-          const arr = [
-            "cameraId",
-            "background-color",
-            "text-color",
-            "background-image",
-          ];
-          const payloadClone: Record<string, any> = { ...payload };
-          let obj: Record<string, any> = {};
-          for (let item of arr) {
-            if (payloadClone[item]) obj[item] = payloadClone[item];
-          }
-          setStyleState({ ...styleState, ...obj });
-        } else setMetadata(payload);
-
-        console.log({ payload }, isIPayload(payload));
+    const displayAction = (payload: IPayloadMetadata) => {
+      // if (payload.action === "nextVerse")
+      if (isIPayload(payload)) {
+        setMessage(payload);
+        const arr = [
+          "cameraId",
+          "background-color",
+          "text-color",
+          "background-image",
+        ];
+        const payloadClone: Record<string, any> = { ...payload };
+        let obj: Record<string, any> = {};
+        for (let item of arr) {
+          if (payloadClone[item]) obj[item] = payloadClone[item];
+        }
+        setStyleState((prevState) => ({ ...prevState, ...obj }));
+      } else setMetadata(payload);
+      if (payload.schedule) {
+        saveToSchedule(payload);
       }
-    );
+      console.log({ payload }, isIPayload(payload));
+    };
+
+    window.electron.ipcRenderer.on("display-action", displayAction);
   }, []);
 
   useEffect(() => {
@@ -242,18 +249,18 @@ const ProcessLayout = () => {
   }, [metadata]);
 
   return (
-    <div className='text-black container h-full py-2 overflow-hidden'>
-      <div className='flex gap-1 items-center justify-between'>
+    <div className='container h-full py-2 overflow-hidden'>
+      <div className='flex gap-1 items-center justify-between bg-[#191970] px-2'>
         <div>Process</div>
 
         <div className='flex'>
           {" "}
-          <TextCursor
+          <Type
             onClick={() => handleClick(1)}
             className='w-5 h-5 cursor-pointer'
           >
             <title>Text Color</title>
-          </TextCursor>
+          </Type>
           <div
             className='w-2 h-5'
             style={{ background: styleState?.["text-color"] }}
@@ -290,7 +297,10 @@ const ProcessLayout = () => {
           ></div>
         </div>
 
-        <Save className='w-5 h-5 cursor-pointer' onClick={saveToSchedule}>
+        <Save
+          className='w-5 h-5 cursor-pointer'
+          onClick={() => saveToSchedule()}
+        >
           <title>Save to Schedule</title>
         </Save>
       </div>

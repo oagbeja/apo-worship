@@ -11,7 +11,7 @@ const BottomLayout = () => {
         { title: "Scripture", component: <Bible /> },
         { title: "Songs", component: <Song /> },
         { title: "Images", component: <BImages /> },
-        { title: "Write-up", component: <div>Write-up</div> },
+
         { title: "Theme", component: <ThemePage /> },
       ]}
     />
